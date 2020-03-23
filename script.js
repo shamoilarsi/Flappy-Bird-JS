@@ -16,14 +16,12 @@ function getCookie(cname) {
 
 const cvs = document.getElementById('canvas');
 const ctx = cvs.getContext('2d');
-const DEGREE = Math.PI/180;
 let maxScore = getCookie('maxScore')
 
 let sprite = new Image()
-let background = new Image();
-let ground = new Image();
 let pipeNorth = new Image();
 let pipeSouth = new Image();
+
 
 function getPipe() {
     prev_rand = rand;
@@ -103,7 +101,7 @@ let bird = {
         }
      },
     
-    draw: () => {  //don't use this. here 
+    draw: () => {  
         if(frame % 5 == 0) bird.frame++;
 
         ctx.drawImage(sprite, bird.animation[bird.frame%4].sX, bird.animation[bird.frame%4].sY, bird.body.width, bird.body.height, bird.x, bird.y, bird.body.width, bird.body.height)
@@ -167,7 +165,7 @@ function draw() {
             SCORE_S.play()
         }
 
-        // removing pipes 
+        
         else if (pipe.x + pipeNorth.width < 0) {
             pipes.shift()
             pipeCountedForScore = false;
