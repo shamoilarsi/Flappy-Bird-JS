@@ -25,6 +25,19 @@ let ground = new Image();
 let pipeNorth = new Image();
 let pipeSouth = new Image();
 
+function getPipe() {
+    prev_rand = rand;
+    do {
+        rand = Math.random()
+    } while (rand < 0.1 || Math.abs(rand - prev_rand) > 0.5);
+    // console.log("rand = " + rand + "  prevRand = " + prev_rand)
+            
+    return {
+        x: cvs.width,
+        y: Math.floor(rand * pipeNorth.height) - pipeNorth.height
+    }
+}
+
 sprite.src = 'images/sprite.png';
 const bg = {
     sX : 0,
@@ -115,7 +128,7 @@ let gravity = 0.2;
 let jump = 4;
 let score = 0;
 let speed = 0;
-let rand = 0.2 , prev_rand = 0.1;
+let rand = 0.5 , prev_rand = 0.5;
 let collisionDetected = false;
 let pipeCountedForScore = false;
 let frame = 0
@@ -132,10 +145,7 @@ document.addEventListener('keydown', () => {
 })
 
 let pipes = []
-pipes[0] = {
-    x: cvs.width,
-    y: (rand * pipeNorth.height) - pipeNorth.height
-}
+pipes[0] = getPipe()
 
 function draw() {
     frame++;
@@ -147,16 +157,7 @@ function draw() {
         pipe.x--;
 
         if (pipe.x == 100) {
-            prev_rand = rand;
-            do {
-                rand = Math.random()
-            } while (rand < 0.1 || Math.abs(rand - prev_rand) > 0.5);
-            // console.log("rand = " + rand + "  prevRand = " + prev_rand)
-            
-            pipes.push({
-                x: cvs.width,
-                y: Math.floor(rand * pipeNorth.height) - pipeNorth.height
-            })
+            pipes.push(getPipe())
         }
 
         else if(bird.x > pipe.x + pipeNorth.width && !pipeCountedForScore) {
