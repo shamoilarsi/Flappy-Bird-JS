@@ -27,8 +27,7 @@ function getPipe() {
     prev_rand = rand;
     do {
         rand = Math.random()
-    } while (rand < 0.1 || Math.abs(rand - prev_rand) > 0.5);
-    // console.log("rand = " + rand + "  prevRand = " + prev_rand)
+    } while (rand < 0.1 || Math.abs(rand - prev_rand) > 0.6);
             
     return {
         x: cvs.width,
