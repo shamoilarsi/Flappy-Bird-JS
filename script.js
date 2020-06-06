@@ -1,120 +1,177 @@
 function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(";");
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == " ") {
+      c = c.substring(1);
     }
-    return 0;
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return 0;
 }
 
 function constrain(value, min, max) {
-    return (value <= min ? min : (value >= max ? max : value))
+  return value <= min ? min : value >= max ? max : value;
 }
 
 function distanceBetweenPoints(p1, p2) {
-    return (Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2))
+  return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2);
 }
 
+const cvs = document.getElementById("canvas");
+const ctx = cvs.getContext("2d");
+let maxScore = getCookie("maxScore");
 
-const cvs = document.getElementById('canvas');
-const ctx = cvs.getContext('2d');
-let maxScore = getCookie('maxScore')
-
-let sprite = new Image()
+let sprite = new Image();
 let pipeNorth = new Image();
 let pipeSouth = new Image();
 
-
 function getPipe() {
-    prev_rand = rand;
-    do {
-        rand = Math.random()
-    } while (rand < 0.1 || Math.abs(rand - prev_rand) > 0.6);
+  prev_rand = rand;
+  do {
+    rand = Math.random();
+  } while (rand < 0.1 || Math.abs(rand - prev_rand) > 0.6);
 
-    return {
-        x: cvs.width,
-        y: Math.floor(rand * pipeNorth.height) - pipeNorth.height
-    }
+  return {
+    x: cvs.width,
+    y: Math.floor(rand * pipeNorth.height) - pipeNorth.height,
+  };
 }
 
-sprite.src = 'images/sprite.png';
+sprite.src = "images/sprite.png";
 const bg = {
-    sX: 0,
-    sY: 0,
-    w: 275,
-    h: 226,
-    x: 0,
-    y: cvs.height - 226,
+  sX: 0,
+  sY: 0,
+  w: 275,
+  h: 226,
+  x: 0,
+  y: cvs.height - 226,
 
-    draw: function () {
-        ctx.fillStyle = "#70c5ce";
-        ctx.fillRect(0, 0, cvs.width, cvs.height);
+  draw: function () {
+    ctx.fillStyle = "#70c5ce";
+    ctx.fillRect(0, 0, cvs.width, cvs.height);
 
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + this.w, this.y, this.w, this.h);
-    }
-}
+    ctx.drawImage(
+      sprite,
+      this.sX,
+      this.sY,
+      this.w,
+      this.h,
+      this.x,
+      this.y,
+      this.w,
+      this.h
+    );
+    ctx.drawImage(
+      sprite,
+      this.sX,
+      this.sY,
+      this.w,
+      this.h,
+      this.x + this.w,
+      this.y,
+      this.w,
+      this.h
+    );
+  },
+};
 
 const fg = {
-    sX: 276,
-    sY: 0,
-    w: 224,
-    h: 112,
-    x: 0,
-    y: cvs.height - 112,
+  sX: 276,
+  sY: 0,
+  w: 224,
+  h: 112,
+  x: 0,
+  y: cvs.height - 112,
 
-    draw: function () {
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x + this.w, this.y, this.w, this.h);
-    }
-}
+  draw: function () {
+    ctx.drawImage(
+      sprite,
+      this.sX,
+      this.sY,
+      this.w,
+      this.h,
+      this.x,
+      this.y,
+      this.w,
+      this.h
+    );
+    ctx.drawImage(
+      sprite,
+      this.sX,
+      this.sY,
+      this.w,
+      this.h,
+      this.x + this.w,
+      this.y,
+      this.w,
+      this.h
+    );
+  },
+};
 
 const gameOver = {
-    sX: 175,
-    sY: 228,
-    w: 225,
-    h: 170,
-    x: cvs.width / 2 - 225 / 2,
-    y: cvs.height / 2 - 202 / 2 - 20,
+  sX: 175,
+  sY: 228,
+  w: 225,
+  h: 170,
+  x: cvs.width / 2 - 225 / 2,
+  y: cvs.height / 2 - 202 / 2 - 20,
 
-    draw: function () {
-        ctx.drawImage(sprite, this.sX, this.sY, this.w, this.h, this.x, this.y, this.w, this.h);
-    }
-}
+  draw: function () {
+    ctx.drawImage(
+      sprite,
+      this.sX,
+      this.sY,
+      this.w,
+      this.h,
+      this.x,
+      this.y,
+      this.w,
+      this.h
+    );
+  },
+};
 
 let bird = {
-    animation: [
-        { sX: 276, sY: 112 },
-        { sX: 276, sY: 139 },
-        { sX: 276, sY: 164 },
-        { sX: 276, sY: 139 }
-    ],
-    x: 20,
-    y: 100,
-    frame: 0,
-    rotation: 0,
-    body: {
-        width: 34,
-        height: 26,
-        radius: 12
-    },
+  animation: [
+    { sX: 276, sY: 112 },
+    { sX: 276, sY: 139 },
+    { sX: 276, sY: 164 },
+    { sX: 276, sY: 139 },
+  ],
+  x: 20,
+  y: 100,
+  frame: 0,
+  rotation: 0,
+  body: {
+    width: 34,
+    height: 26,
+    radius: 12,
+  },
 
-    draw: () => {
-        if (frame % 5 == 0) bird.frame++;
-        ctx.drawImage(sprite, bird.animation[bird.frame % 4].sX, bird.animation[bird.frame % 4].sY, bird.body.width, bird.body.height, bird.x, bird.y, bird.body.width, bird.body.height)
-    }
-}
+  draw: () => {
+    if (frame % 5 == 0) bird.frame++;
+    ctx.drawImage(
+      sprite,
+      bird.animation[bird.frame % 4].sX,
+      bird.animation[bird.frame % 4].sY,
+      bird.body.width,
+      bird.body.height,
+      bird.x,
+      bird.y,
+      bird.body.width,
+      bird.body.height
+    );
+  },
+};
 
-pipeNorth.src = 'images/pipeNorth.png';
-pipeSouth.src = 'images/pipeSouth.png';
-
+pipeNorth.src = "images/pipeNorth.png";
+pipeSouth.src = "images/pipeSouth.png";
 
 const SCORE_S = new Audio();
 SCORE_S.src = "audio/sfx_point.wav";
@@ -130,107 +187,101 @@ let gravity = 0.2;
 let jump = 4;
 let score = 0;
 let speed = 0;
-let rand = 0.5, prev_rand = 0.5;
+let rand = 0.5,
+  prev_rand = 0.5;
 let collisionDetected = false;
 let pipeCountedForScore = false;
-let frame = 0
+let frame = 0;
 
+document.addEventListener("keydown", () => {
+  if (!collisionDetected) {
+    FLAP.play();
+    speed = -jump;
+  } else location.reload();
+});
 
-document.addEventListener('keydown', () => {
-    if (!collisionDetected) {
-        FLAP.play()
-        speed = -jump
-    }
-
-    else
-        location.reload()
-})
-
-let pipes = []
-pipes[0] = getPipe()
+let pipes = [];
+pipes[0] = getPipe();
 
 function draw() {
-    frame++;
-    bg.draw()
+  frame++;
+  bg.draw();
 
-    pipes.forEach((pipe) => {
-        ctx.drawImage(pipeNorth, pipe.x, pipe.y)
-        ctx.drawImage(pipeSouth, pipe.x, pipe.y + constant_gap)
-        pipe.x--;
+  pipes.forEach((pipe) => {
+    ctx.drawImage(pipeNorth, pipe.x, pipe.y);
+    ctx.drawImage(pipeSouth, pipe.x, pipe.y + constant_gap);
+    pipe.x--;
 
-        if (pipe.x == 100) {
-            pipes.push(getPipe())
-        }
-
-        else if (bird.x > pipe.x + pipeNorth.width && !pipeCountedForScore) {
-            score++;
-            maxScore = Math.max(maxScore, score)
-            pipeCountedForScore = true;
-            SCORE_S.play()
-        }
-
-
-        else if (pipe.x + pipeNorth.width < 0) {
-            pipes.shift()
-            pipeCountedForScore = false;
-        }
-
-        pointsOnNorthPipe = {
-            x: constrain(bird.x + bird.body.radius, pipe.x, pipe.x + pipeNorth.width),
-            y: constrain(bird.y + bird.body.radius, pipe.y, pipe.y + pipeNorth.height)
-        }
-
-        pointsOnSouthPipe = {
-            x: constrain(bird.x + bird.body.radius, pipe.x, pipe.x + pipeNorth.width),
-            y: constrain(bird.y + bird.body.radius, pipe.y + constant_gap, cvs.height - fg.h)
-        }
-
-        if (distanceBetweenPoints({ x: bird.x + bird.body.radius, y: bird.y + bird.body.radius }, pointsOnNorthPipe) <= bird.body.radius ||
-            distanceBetweenPoints({ x: bird.x + bird.body.radius, y: bird.y + bird.body.radius }, pointsOnSouthPipe) <= bird.body.radius || 
-            (bird.y + bird.body.height > cvs.height - fg.h)) {
-            collisionDetected = true;
-            HIT.play()
-        }
-
-        /*
-        ctx.beginPath()
-        ctx.moveTo(bird.x + bird.body.radius/2, bird.y + bird.body.radius/2);
-        ctx.lineTo(pointsOnNorthPipe.x, pointsOnNorthPipe.y);
-        ctx.stroke()
-        
-        ctx.beginPath()
-        ctx.moveTo(bird.x + bird.body.radius/2, bird.y + bird.body.radius/2);
-        ctx.lineTo(pointsOnSouthPipe.x, pointsOnSouthPipe.y);
-        ctx.stroke()
-        */
-
-    })
-
-    fg.draw()
-    bird.draw()
-    speed += gravity
-    bird.y += speed;
-    ctx.fillStyle = '#FFF'
-
-    if (collisionDetected) {
-        gameOver.draw()
-        window.cancelAnimationFrame(draw);
-        ctx.font = "25px Teko";
-        ctx.fillText(score, 222, 229);
-        ctx.strokeText(score, 222, 229);
-        ctx.fillText(maxScore, 222, 271);
-        ctx.strokeText(maxScore, 222, 271);
-        document.cookie = 'maxScore=' + maxScore
+    if (pipe.x == 100) {
+      pipes.push(getPipe());
+    } else if (bird.x > pipe.x + pipeNorth.width && !pipeCountedForScore) {
+      score++;
+      maxScore = Math.max(maxScore, score);
+      pipeCountedForScore = true;
+      SCORE_S.play();
+    } else if (pipe.x + pipeNorth.width < 0) {
+      pipes.shift();
+      pipeCountedForScore = false;
     }
-    else {
-        ctx.lineWidth = 2;
-        ctx.font = "35px Teko";
-        ctx.fillText(score, cvs.width / 2 - 10, 50);
-        ctx.strokeText(score, cvs.width / 2 - 10, 50);
-        requestAnimationFrame(draw)
+
+    pointsOnNorthPipe = {
+      x: constrain(bird.x + bird.body.radius, pipe.x, pipe.x + pipeNorth.width),
+      y: constrain(
+        bird.y + bird.body.radius,
+        pipe.y,
+        pipe.y + pipeNorth.height
+      ),
+    };
+
+    pointsOnSouthPipe = {
+      x: constrain(bird.x + bird.body.radius, pipe.x, pipe.x + pipeNorth.width),
+      y: constrain(
+        bird.y + bird.body.radius,
+        pipe.y + constant_gap,
+        cvs.height - fg.h
+      ),
+    };
+
+    if (
+      distanceBetweenPoints(
+        { x: bird.x + bird.body.radius, y: bird.y + bird.body.radius },
+        pointsOnNorthPipe
+      ) <= bird.body.radius ||
+      distanceBetweenPoints(
+        { x: bird.x + bird.body.radius, y: bird.y + bird.body.radius },
+        pointsOnSouthPipe
+      ) <= bird.body.radius ||
+      bird.y + bird.body.height > cvs.height - fg.h
+    ) {
+      collisionDetected = true;
+      HIT.play();
     }
+  });
+
+  fg.draw();
+  bird.draw();
+  speed += gravity;
+  if (bird.y + speed > 0) bird.y += speed;
+  ctx.fillStyle = "#FFF";
+
+  if (collisionDetected) {
+    gameOver.draw();
+    window.cancelAnimationFrame(draw);
+    ctx.font = "25px Teko";
+    ctx.fillText(score, 222, 229);
+    ctx.strokeText(score, 222, 229);
+    ctx.fillText(maxScore, 222, 271);
+    ctx.strokeText(maxScore, 222, 271);
+    document.cookie = "maxScore=" + maxScore;
+  } else {
+    ctx.lineWidth = 2;
+    ctx.font = "35px Teko";
+    ctx.fillText(score, cvs.width / 2 - 10, 50);
+    ctx.strokeText(score, cvs.width / 2 - 10, 50);
+    requestAnimationFrame(draw);
+  }
 }
 
 pipeSouth.onload = () => {
-    draw();
-}
+  draw();
+};
